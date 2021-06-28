@@ -1,1 +1,2 @@
-console.log('wanghaoyu')
+
+console.log('wanghaoyu');
