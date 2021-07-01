@@ -1,9 +1,11 @@
 const reg_mark = /^(.+?)\s/;
 const reg_sharp = /^\#+/;
+const reg_crossbar = /^\-/;
 
 function createTree(mdArr) {
   const _htmlPool = {};
   let lastMark = '';
+  let lastTagKey = '';
 
   mdArr.forEach((i) => {
     const matched = i.match(reg_mark);
@@ -15,6 +17,20 @@ function createTree(mdArr) {
         tag,
       };
       lastMark = realKey;
+      lastTagKey = key;
+    }
+    if (reg_crossbar.test(mark)) {
+      const { key, realKey, tag, type } = _parseTag(matched, 'crossbar');
+      if (lastMark === realKey) {
+        _htmlPool[lastTagKey].tag.push(...tag);
+      } else {
+        _htmlPool[key] = {
+          type,
+          tag,
+        };
+        lastMark = realKey;
+        lastTagKey = key;
+      }
     }
   });
 
@@ -28,14 +44,28 @@ function _parseTag(matched, type) {
 
   const typeList = {
     sharp: _parseSharp,
+    crossbar: _parseCrossbar,
   };
 
   return typeList[type](matched[1], content);
   // utils
+
+  // 无序列表
+  function _parseCrossbar() {
+    const tag = `li`;
+    return {
+      key: `ul-${Date.now()}`,
+      realKey: 'ul',
+      type: 'multiple',
+      tag: [`<${tag}>${content}</${tag}>`],
+    };
+  }
+  
+  // H标签
   function _parseSharp() {
     const tag = `h${mark.length}`;
     return {
-      key: `${tag}-${Math.random()}`,
+      key: `${tag}-${Date.now()}`,
       realKey: tag,
       type: 'single',
       tag: [`<${tag}>${content}<\${tag}>`],
