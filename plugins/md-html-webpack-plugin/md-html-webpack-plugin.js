@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { createTree } = require('./compile')
+const { createTree } = require('./compile');
 
 const MARK_STRING = '<div id="md"></div>';
 
@@ -46,18 +46,20 @@ function compileHTML(filePath) {
 }
 
 function _compileMdToHTML(html, md) {
-
   const mdArr = md.split('\n').filter((i) => i);
 
-  const tree = createTree(mdArr)
+  const tree = createTree(mdArr);
 
+  // 将tree转化成html节点
 
-  // const newHtmlString = html.replace(MARK_STRING, parsedHtml);
+  console.log(tree, 'tree');
 
-  return {
-    source: newHtmlString,
-    size: newHtmlString.length,
-  };
+  const newHtmlString = html.replace(MARK_STRING, parsedHtml);
+
+  // return {
+  //   source: newHtmlString,
+  //   size: newHtmlString.length,
+  // };
 }
 
 module.exports = MdHtmlWebpackPlugin;

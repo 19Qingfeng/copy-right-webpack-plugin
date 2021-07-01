@@ -1,6 +1,8 @@
 const reg_mark = /^(.+?)\s/;
 const reg_sharp = /^\#+/;
 const reg_crossbar = /^\-/;
+const reg_number = /^\d/;
+
 
 function createTree(mdArr) {
   const _htmlPool = {};
@@ -32,9 +34,21 @@ function createTree(mdArr) {
         lastTagKey = key;
       }
     }
+    if (reg_number.test(mark)) {
+      const { key, realKey, tag, type } = _parseTag(matched, 'number');
+      if (lastMark === realKey) {
+        _htmlPool[lastTagKey].tag.push(...tag);
+      } else {
+        _htmlPool[key] = {
+          type,
+          tag,
+        };
+        lastMark = realKey;
+        lastTagKey = key;
+      }
+    }
   });
-
-  console.log(_htmlPool, '_htmlPool');
+  return _htmlPool;
 }
 
 function _parseTag(matched, type) {
@@ -45,10 +59,22 @@ function _parseTag(matched, type) {
   const typeList = {
     sharp: _parseSharp,
     crossbar: _parseCrossbar,
+    number: _parseNumber,
   };
 
   return typeList[type](matched[1], content);
   // utils
+
+  // 有序列表
+  function _parseNumber() {
+    const tag = `li`;
+    return {
+      key: `ol-${Date.now()}`,
+      realKey: 'ol',
+      type: 'multiple',
+      tag: [`<${tag}>${content}</${tag}>`],
+    };
+  }
 
   // 无序列表
   function _parseCrossbar() {
@@ -60,7 +86,7 @@ function _parseTag(matched, type) {
       tag: [`<${tag}>${content}</${tag}>`],
     };
   }
-  
+
   // H标签
   function _parseSharp() {
     const tag = `h${mark.length}`;
@@ -68,7 +94,7 @@ function _parseTag(matched, type) {
       key: `${tag}-${Date.now()}`,
       realKey: tag,
       type: 'single',
-      tag: [`<${tag}>${content}<\${tag}>`],
+      tag: [`<${tag}>${content}</${tag}>`],
     };
   }
 }
