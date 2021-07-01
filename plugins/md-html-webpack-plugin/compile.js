@@ -3,6 +3,23 @@ const reg_sharp = /^\#+/;
 const reg_crossbar = /^\-/;
 const reg_number = /^\d/;
 
+function parseObjectToHTML(object) {
+  let _html = '';
+  Object.keys(object).forEach((key) => {
+    const formatKey = key.slice(0, key.indexOf('-'));
+    const value = object[key];
+    const tagType = value.type;
+    const innerTag = value.tag;
+
+    if (tagType === 'multiple') {
+      _html += `<${formatKey}>${innerTag.join('')}</${formatKey}>`;
+    } else {
+      _html += innerTag;
+    }
+  });
+
+  return _html;
+}
 
 function createTree(mdArr) {
   const _htmlPool = {};
@@ -101,4 +118,5 @@ function _parseTag(matched, type) {
 
 module.exports = {
   createTree,
+  parseObjectToHTML,
 };

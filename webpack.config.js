@@ -13,7 +13,7 @@ module.exports = {
     }),
     new MdHtmlWebpackPlugin({
       template: path.resolve(__dirname, './demo/index.md'),
-      filename: 'index.md',
+      filename: 'index.html',
     }),
   ],
   output: {
